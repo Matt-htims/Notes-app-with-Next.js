@@ -1,65 +1,52 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import Link from 'next/link';
+import fetch from 'isomorphic-unfetch';
+import { Button, Card } from 'semantic-ui-react';
 
-export default function Home() {
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+const Index = ({ notes }) => {
+	return (
+		<div className="notes-container">
+			<h1>Notes</h1>
+			<div className="grid wrapper">
+				{notes.map(note => {
+					return (
+						<div key={note._id}>
+							<Card>
+								<Card.Content>
+									<Card.Header>
+										<Link href={`/${note._id}`}>
+											<a>{note.title}</a>
+										</Link>
+									</Card.Header>
+								</Card.Content>
+								<Card.Content extra>
+									<Link href={`/${note._id}`}>
+										<a>
+											<Button primary>View</Button>
+										</a>
+									</Link>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+									<Link href={`/${note._id}/edit`}>
+										<a>
+											<Button primary>Edit</Button>
+										</a>
+									</Link>
+								</Card.Content>
+							</Card>
+						</div>
+					);
+				})}
+			</div>
+		</div>
+	);
+};
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+//A Next.js function that allows us to run some code before the component gets rendered out to the page
+//Runs server side so will make api request to fetch data we need for index page
+Index.getInitialProps = async () => {
+	const res = await fetch('http://localhost:3000/api/notes');
+	const { data } = await res.json();
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+	return { notes: data };
+};
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
-}
+export default Index;
