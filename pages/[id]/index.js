@@ -57,13 +57,11 @@ const Note = ({ note }) => {
 	);
 };
 
-//  Get a context object when using this function
-//  From this we can destructure out the id param from the link
-Note.getInitialProps = async ({ query: { id } }) => {
+export async function getServerSideProps({ query: { id } }) {
 	const res = await fetch(`http://localhost:3000/api/notes/${id}`);
 	const { data } = await res.json();
 
-	return { note: data };
-};
+	return { props: { note: data } };
+}
 
 export default Note;
